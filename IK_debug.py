@@ -64,7 +64,7 @@ def test_code(test_case):
 
     ## Insert IK code here!
     # Link offset
-    d1, d2, d3, d5, d6, d7 = symbols('d1:8') 
+    d1, d2, d3, d4, d5, d6, d7 = symbols('d1:8') 
     # Link length
     a0, a1, a2, a3, a4, a5, a6 = symbols('a0:7')
     # Twist angle
@@ -84,9 +84,9 @@ def test_code(test_case):
     # Define Modified DH Transformation matrix
     def TF_Matrix(alpha, a, d, q):
         TF = Matrix([
-            [           cos(q),           -sin(q),           0,             a]
-            [sin(q)*cos(alpha), cos(q)*cos(alpha), -sin(alpha), -sin(alpha)*d]
-            [sin(q)*sin(alpha), cos(q)*sin(alpha),  cos(alpha),  cos(alpha)*d]
+            [           cos(q),           -sin(q),           0,             a],
+            [sin(q)*cos(alpha), cos(q)*cos(alpha), -sin(alpha), -sin(alpha)*d],
+            [sin(q)*sin(alpha), cos(q)*sin(alpha),  cos(alpha),  cos(alpha)*d],
             [                0,                 0,           0,             1]])
 
         return TF
@@ -135,7 +135,7 @@ def test_code(test_case):
     ROT_EE = ROT_z * ROT_y * ROT_x
 
     # Compensate for rotation discrepancy between DH parameters and Gazebo
-    Rot_Error = ROT_z.sub(y, radians(180)) * ROT_y.sub(p, radians(-90))
+    Rot_Error = ROT_z.subs(y, radians(180)) * ROT_y.subs(p, radians(-90))
 
     ROT_EE = ROT_EE * Rot_Error
     ROT_EE = ROT_EE.subs({'r': roll, 'p': pitch, 'y': yaw})
@@ -160,12 +160,12 @@ def test_code(test_case):
     theta2 = pi / 2 - angle_a - atan2(WC[2] - 0.75, sqrt(WC[0] * WC[0] + WC[1] * WC[1]) - 0.35)
     theta3 = pi / 2 - (angle_b + 0.036)	# 0.036 is the magic number for sag in link4 of 0.054m
 
-    R0_3 = TO_1[0:3, 0:3] * T1_2[0:3, 0:3] * T2_3[0:3, 0:3]
+    R0_3 = T0_1[0:3, 0:3] * T1_2[0:3, 0:3] * T2_3[0:3, 0:3]
     R0_3 = R0_3.evalf(subs={q1: theta1, q2: theta2, q3: theta3})
     R3_6 = R0_3.inv('LU') * ROT_EE
 
     theta4 = atan2(R3_6[2, 2], -R3_6[0, 2])
-    theta5 = athan2(sqrt(R3_6[0, 2] * R3_6[0, 2] + R3_6[2, 2] * R3_6[2, 2]), R3_6[1, 2])
+    theta5 = atan2(sqrt(R3_6[0, 2] * R3_6[0, 2] + R3_6[2, 2] * R3_6[2, 2]), R3_6[1, 2])
     theta6 = atan2(-R3_6[1, 1], R3_6[1, 0])
 
     ## 
@@ -176,13 +176,13 @@ def test_code(test_case):
     ## as the input and output the position of your end effector as your_ee = [x,y,z]
 
     ## (OPTIONAL) YOUR CODE HERE!
-    FK = T0_EE.evalf(subs={q1: theta1, q2: theta2, q3, theta3, q4: theta4, q5: theta5, q6:theta6})
+    FK = T0_EE.evalf(subs={q1: theta1, q2: theta2, q3: theta3, q4: theta4, q5: theta5, q6:theta6})
     ## End your code input for forward kinematics here!
     ########################################################################################
 
     ## For error analysis please set the following variables of your WC location and EE location in the format of [x,y,z]
-    your_wc = [1,1,1] # <--- Load your calculated WC values in this array
-    your_ee = [1,1,1] # <--- Load your calculated end effector value from your forward kinematics
+    your_wc = [WC[0], WC[1], WC[2]] # <--- Load your calculated WC values in this array
+    your_ee = [FK[0, 3], FK[1, 3], FK[2,3]] # <--- Load your calculated end effector value from your forward kinematics
     ########################################################################################
 
     ## Error analysis
