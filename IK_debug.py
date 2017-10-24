@@ -146,16 +146,27 @@ def test_code(test_case):
 
     WC = EE - (0.303) * ROT_EE[:,2]
 
-	#
-	#
 	# Calculate joint angles using Geometric IK method
+    # Triangle to calculate theta2 and theta3
+    side_a = 1.501
+    side_b = sqrt(pow((sqrt(WC[0] * WC[0] + WC[1] * WC[1]) - 0.35), 2) + pow((WC[2] - 0.75), 2))
+    side_c = 1.25
 
-    theta1 = 0
-    theta2 = 0
-    theta3 = 0
-    theta4 = 0
-    theta5 = 0
-    theta6 = 0
+    angle_a = acos((side_b * side_b + side_c * side_c - side_a * side_a) / (2 * side_b * side_c))
+    angle_b = acos((side_a * side_a + side_c * side_c - side_b * side_b) / (2 * side_a * side_c))
+    angle_c = acos((side_a * side_a + side_b * side_b - side_c * side_c) / (2 * side_a * side_b))
+
+    theta1 = atan2(WC[1], WC[0])
+    theta2 = pi / 2 - angle_a - atan2(WC[2] - 0.75, sqrt(WC[0] * WC[0] + WC[1] * WC[1]) - 0.35)
+    theta3 = pi / 2 - (angle_b + 0.036)	# 0.036 is the magic number for sag in link4 of 0.054m
+
+    R0_3 = TO_1[0:3, 0:3] * T1_2[0:3, 0:3] * T2_3[0:3, 0:3]
+    R0_3 = R0_3.evalf(subs={q1: theta1, q2: theta2, q3: theta3})
+    R3_6 = R0_3.inv('LU') * ROT_EE
+
+    theta4 = atan2(R3_6[2, 2], -R3_6[0, 2])
+    theta5 = athan2(sqrt(R3_6[0, 2] * R3_6[0, 2] + R3_6[2, 2] * R3_6[2, 2]), R3_6[1, 2])
+    theta6 = atan2(-R3_6[1, 1], R3_6[1, 0])
 
     ## 
     ########################################################################################
@@ -165,7 +176,7 @@ def test_code(test_case):
     ## as the input and output the position of your end effector as your_ee = [x,y,z]
 
     ## (OPTIONAL) YOUR CODE HERE!
-
+    FK = T0_EE.evalf(subs={q1: theta1, q2: theta2, q3, theta3, q4: theta4, q5: theta5, q6:theta6})
     ## End your code input for forward kinematics here!
     ########################################################################################
 
