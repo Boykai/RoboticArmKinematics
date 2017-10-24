@@ -110,6 +110,46 @@ def test_code(test_case):
     py = req.poses[x].position.y
     pz = req.poses[x].position.z
 
+    (roll, pitch, yaw) = tf.transformations.euler_from_quaternion(
+                [req.poses[x].orientation.x, req.poses[x].orientation.y,
+                    req.poses[x].orientation.z, req.poses[x].orientation.w])
+
+    r, p, y = symbols('r p y')
+
+    # Roll
+    ROT_x = Matrix([[1,      0,       0],
+    				[0, cos(r), -sin(r)],
+    				[0, sin(r),  cos(r)]])
+
+    # Pitch
+    ROT_y = Matrix([[ cos(p), 0, sin(p)],
+    				[      0, 1,      0],
+    				[-sin(p), 0, cos(p)]])
+
+    # Yaw
+    ROT_z = Matrix([[cos(y), -sin(y), 0],
+    				[sin(y),  cos(y), 0],
+    				[0,            0, 1]])
+
+    # EE Rotation
+    ROT_EE = ROT_z * ROT_y * ROT_x
+
+    # Compensate for rotation discrepancy between DH parameters and Gazebo
+    Rot_Error = ROT_z.sub(y, radians(180)) * ROT_y.sub(p, radians(-90))
+
+    ROT_EE = ROT_EE * Rot_Error
+    ROT_EE = ROT_EE.subs({'r': roll, 'p': pitch, 'y': yaw})
+
+    EE = Matrix([[px],
+    			 [py],
+    			 [pz]])
+
+    WC = EE - (0.303) * ROT_EE[:,2]
+
+	#
+	#
+	# Calculate joint angles using Geometric IK method
+
     theta1 = 0
     theta2 = 0
     theta3 = 0
