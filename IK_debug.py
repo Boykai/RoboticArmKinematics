@@ -63,6 +63,17 @@ def test_code(test_case):
     ## 
 
     ## Insert IK code here!
+    # Define DH parameter symbols
+
+    # Link offset
+    d1, d2, d3, d5, d6, d7 = symbols('d1:8') 
+    # Link length
+    a0, a1, a2, a3, a4, a5, a6 = symbols('a0:7')
+    # Twist angle
+    alpha0, alpha1, alpha2, alpha3, alpha4, alpha5, alpha6 = symbols('alpha0:7')
+	# Joint angle
+	q1, q2, q3, q4, q5, q6, q7 = symbols('q1:8')
+
     
     theta1 = 0
     theta2 = 0
