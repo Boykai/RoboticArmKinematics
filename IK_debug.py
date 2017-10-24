@@ -92,7 +92,19 @@ def test_code(test_case):
     		[                0,                 0,           0,             1]])
 
     	return TF
-    	
+
+    # Create seperate transformation matrices
+    T0_1  = TF_Matrix(alpha0, a0, d1, q1).subs(DH_Table)
+    T1_2  = TF_Matrix(alpha1, a1, d2, q2).subs(DH_Table)
+    T2_3  = TF_Matrix(alpha2, a2, d3, q3).subs(DH_Table)
+    T3_4  = TF_Matrix(alpha3, a3, d4, q4).subs(DH_Table)
+    T4_5  = TF_Matrix(alpha4, a4, d5, q5).subs(DH_Table)
+    T5_6  = TF_Matrix(alpha5, a5, d6, q6).subs(DH_Table)
+    T6_EE = TF_Matrix(alpha6, a6, d7, q7).subs(DH_Table)
+
+    # Tranform from base to end effector
+    T0_EE = T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_EE
+
     theta1 = 0
     theta2 = 0
     theta3 = 0
